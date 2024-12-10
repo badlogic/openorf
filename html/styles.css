@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --bg: #ffffff;
+    --fg: #111;
+    --muted: #666;
+    --muted-strong: #888;
+    --primary: #3b82f6;
+    --primary-fg: #ffffff;
+    --primary-muted: #94bbfa;
+    --divider: #ccc;
+}
+
+.dark {
+    --bg: #111;
+    --fg: #fff;
+    --muted: #666;
+    --muted-strong: #888;
+    --primary: #3b82f6;
+    --primary-fg: #ffffff;
+    --primary-muted: #94bbfa;
+    --divider: #444;
+}
+
+@layer base {
+    h1 {
+        @apply text-4xl font-bold mb-4;
+    }
+
+    h2 {
+        @apply text-2xl font-semibold mb-3;
+    }
+
+    h3 {
+        @apply text-xl font-medium mb-2;
+    }
+
+    h4 {
+        @apply text-lg font-medium mb-2;
+    }
+
+    input[type="text"] {
+        @apply px-4 py-2 border border-divider outline-none rounded shadow-sm;
+        @apply disabled:text-muted;
+    }
+
+    textarea {
+        @apply rounded;
+    }
+}
+
+@layer components {
+    .btn {
+        @apply px-4 py-2 bg-primary text-primary-fg rounded shadow-sm;
+    }
+
+    .btn[disabled] {
+        @apply bg-primary-muted cursor-not-allowed;
+    }
+}
+
+@layer utilities {
+    i.icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    i.icon > svg {
+        @apply w-full h-full;
+    }
+}
