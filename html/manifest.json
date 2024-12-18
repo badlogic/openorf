@@ -1,7 +1,7 @@
 {
-    "name": "__app_name__",
-    "short_name": "__app_name__",
-    "description": "__app_description__",
+    "name": "openorf",
+    "short_name": "openorf",
+    "description": "ORF but open data",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#000c15",

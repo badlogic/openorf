@@ -2,7 +2,7 @@
 
 set -e
 
-project=__app_name__
+project=openorf
 
 printHelp () {
 	echo "Usage: control.sh <command>"
