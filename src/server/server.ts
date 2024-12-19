@@ -6,14 +6,11 @@ import express from "express";
 import * as fs from "fs";
 import * as path from "path";
 import * as http from "http";
-import multer from "multer";
 import WebSocket, { WebSocketServer } from "ws";
-import { sleep } from "../utils/utils.js";
 import { scrapeTv } from "../data/scrape.js";
 import { SimplifiedTVItem } from "../data/tv.js";
 import { Request, Response } from "express";
 import chalk from "chalk";
-const upload = multer({ storage: multer.memoryStorage() });
 
 const port = process.env.PORT ?? 3333;
 
@@ -30,11 +27,10 @@ const port = process.env.PORT ?? 3333;
 
     app.get("/api/news", async (req: Request, res: Response) => {
         try {
-            // Extract and validate query parameters
             const start = (req.query.start as string) || new Date().toISOString().split("T")[0];
             const end = (req.query.end as string) || start;
+            const subs = (req.query.subs as string) == "true";
 
-            // Validate date format
             const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
             if (!dateRegex.test(start) || !dateRegex.test(end)) {
                 res.status(400).json({
@@ -43,11 +39,9 @@ const port = process.env.PORT ?? 3333;
                 return;
             }
 
-            // Parse dates
             const startDate = new Date(start + "T00:00:00Z");
             const endDate = new Date(end + "T00:00:00Z");
 
-            // Validate date range
             if (startDate.toString() === "Invalid Date" || endDate.toString() === "Invalid Date") {
                 res.status(400).json({
                     error: "Invalid date values",
@@ -62,7 +56,6 @@ const port = process.env.PORT ?? 3333;
                 return;
             }
 
-            // Generate array of dates between start and end (inclusive)
             const dates: string[] = [];
             const currentDate = new Date(startDate);
             while (currentDate <= endDate) {
@@ -70,7 +63,6 @@ const port = process.env.PORT ?? 3333;
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
-            // Read and process all files
             const allItems: SimplifiedTVItem[] = [];
             for (const date of dates) {
                 try {
@@ -79,6 +71,9 @@ const port = process.env.PORT ?? 3333;
                     if (fs.existsSync(filePath)) {
                         const fileContent = fs.readFileSync(filePath, "utf-8");
                         const items = JSON.parse(fileContent) as SimplifiedTVItem[];
+                        if (!subs) {
+                            items.forEach((tv) => tv.segments?.forEach((s) => (s.subtitles = undefined)));
+                        }
                         allItems.push(...items);
                     }
                 } catch (error) {
@@ -136,7 +131,7 @@ function setupLiveReload(server: http.Server) {
 
 async function checkAndScrapeHistorical() {
     const dates = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 30; i++) {
         const date = new Date();
         date.setDate(date.getDate() - i);
         dates.push(date);

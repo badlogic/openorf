@@ -1,3 +1,4 @@
+import { SimplifiedTVItem } from "./data/tv.js";
 import { error } from "./utils/utils.js";
 
 export interface JsonValue {
@@ -15,7 +16,7 @@ export async function apiGet<T>(endpoint: string) {
         if (!result.ok) throw new Error();
         return (await result.json()) as T;
     } catch (e) {
-        return error(`Request /api/${endpoint} failed`, e);
+        throw error(`Request /api/${endpoint} failed`, e);
     }
 }
 
@@ -25,7 +26,7 @@ export async function apiGetText(endpoint: string): Promise<string | Error> {
         if (!result.ok) throw new Error();
         return await result.text();
     } catch (e) {
-        return error(`Request /api/${endpoint} failed`, e);
+        throw error(`Request /api/${endpoint} failed`, e);
     }
 }
 
@@ -35,7 +36,7 @@ export async function apiGetBlob(endpoint: string): Promise<Blob | Error> {
         if (!result.ok) throw new Error();
         return await result.blob();
     } catch (e) {
-        return error(`Request /api/${endpoint} failed`, e);
+        throw error(`Request /api/${endpoint} failed`, e);
     }
 }
 
@@ -45,15 +46,11 @@ export async function apiGetArrayBuffer(endpoint: string): Promise<ArrayBuffer |
         if (!result.ok) throw new Error();
         return await result.arrayBuffer();
     } catch (e) {
-        return error(`Request /api/${endpoint} failed`, e);
+        throw error(`Request /api/${endpoint} failed`, e);
     }
- }
+}
 
-export async function apiPost<T>(
-    endpoint: string,
-    params: URLSearchParams | FormData | JsonValue | Blob | ArrayBuffer,
-    contentType?: string
-) {
+export async function apiPost<T>(endpoint: string, params: URLSearchParams | FormData | JsonValue | Blob | ArrayBuffer, contentType?: string) {
     let headers: HeadersInit = {};
     let body: string | FormData | Blob | ArrayBuffer;
 
@@ -94,5 +91,13 @@ export async function apiPost<T>(
 export class Api {
     static async hello() {
         return apiGet<{ message: string }>("hello");
+    }
+
+    static async news(options: { start?: string; end?: string; subs?: boolean }) {
+        const params = new URLSearchParams();
+        if (options.start) params.append("start", options.start);
+        if (options.end) params.append("end", options.end);
+        params.append("subs", "" + (options.subs == true));
+        return apiGet<SimplifiedTVItem[]>("news?" + params.toString());
     }
 }

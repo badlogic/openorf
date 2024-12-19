@@ -46,6 +46,11 @@
         @apply disabled:text-muted;
     }
 
+    input[type="date"] {
+        @apply p-1 flex-grow border border-divider outline-none rounded shadow-sm;
+        @apply disabled:text-muted;
+    }
+
     textarea {
         @apply rounded;
     }
